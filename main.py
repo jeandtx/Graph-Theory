@@ -104,25 +104,21 @@ def cycles(matrix):
     else 
         return "cycle detected"
     """
-
-    for i in matrix:
-        ctr = 0
-        for j in range(len(i)):
-            if i[j] == 0:
-                ctr += 1
-        if ctr == len(i):
-            matrix.remove(i)
-            # this line deletes the corresponding row
-            matrix = [row[:j] + row[j+1:] for row in matrix]
-            # this line deletes the corresponding column
-            return cycles(matrix)
     if not matrix:
         return False
-    else:
-        return True
+    for j in range(len(matrix)):
+        if not any(matrix[i][j] for i in range(len(matrix))):
+            for i in range(len(matrix)):
+                del matrix[i][j]
+            del matrix[j]
+            return cycles(matrix)
+    return True
 
-def rank(matrix, vertex):
-    pass
+# def rank(graph, vertex):
+#     if vertex == graph["graph"][0]:
+#         return 0
+#     else:
+#         return 1 + rank(, vertex)
     
 
 if __name__ == "__main__":
