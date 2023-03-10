@@ -1,3 +1,39 @@
+def import_graph(filename):
+    """
+    This function convert a .txt constraint table to a graph under a python dictionary.
+    """
+    graph = {"graph": {}, "all_outgoing_edges": []}
+    with open('./data/' + filename + '.txt', "r") as file:
+        data = file.readlines()
+    for i in range(0, len(data)):
+        # Clean the data from empty strings and convert to int
+        data[i] = data[i].replace('\n', '')
+        data[i] = data[i].split(' ')
+        if '' in data[i]: data[i].remove('')
+        data[i] = [int(x) for x in data[i]]
+
+        # add all outgoing edges to a list
+        graph["all_outgoing_edges"].extend(data[i][2:])
+
+
+        graph["graph"][i+1] = {"weight": data[i][1], "outgoing_edges": []}
+    for i in data:
+        for j in i[2:]:
+            graph["graph"][j]["outgoing_edges"].append(i[0])
+
+    return graph
+
+def display_graph(graph):
+    """
+    Displays the graph in triplet form.
+    """
+    print("Creating the scheduling graph:")
+    print(len(graph["graph"]), "vertices")
+    print(len(graph["all_outgoing_edges"]), "edges")
+    for vertices in graph["graph"]:
+        for outgoing_edges in graph["graph"][vertices]["outgoing_edges"]:
+            print(vertices, "->", outgoing_edges)
+
 def number_entry_point(graph):
     """
     Checks the number of entry points.
@@ -40,6 +76,21 @@ def graph_to_matrix(graph):
             matrix[vertices-1][outgoing_edges-1] = 1
     return matrix
 
+def display_matrix(matrix):
+    """
+    Displays the matrix in a nice format.
+    """
+    n = len(matrix[0])
+    print("\n\t", "\t".join(str(i) for i in range(n)))
+    for i in range(n):
+        print(i, end="\t")
+        for j in range(n):
+            if matrix[i][j] == 0:
+                print("", end="\t")
+            else:
+                print(matrix[i][j], end="\t")
+        print()
+
 def cycles(matrix):
     """
     Checks that the graph has no cycles.
@@ -70,18 +121,11 @@ def cycles(matrix):
     else:
         return True
 
-
+def rank(matrix, vertex):
+    pass
     
 
 if __name__ == "__main__":
-    display_table(table) 
-
-    build_graph(table)
-
-    # Checking that this graph satisfies all the properties necessary for it to be a scheduling graph:
-    no_cycles(table)
-    same_weight_for_all_outgoing_edges_of_a_vertex(table)
-    outgoing_edges_of_entry_point_have_weight_0(table)
     no_negative_edges(table)
 
     rank(vertices)
