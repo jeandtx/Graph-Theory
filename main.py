@@ -124,6 +124,33 @@ def negative_edges(graph):
             return False
     return True
 
+def ranks(matrix):
+    ranks = [[0]]
+    for i in range(len(matrix)):
+        del matrix[i][0]
+    del matrix[0]
+    display_matrix(matrix)
+    index = 1
+    while matrix:
+        rank = []
+        # Find empty columns
+        for j in range(len(matrix)):
+            if not any(matrix[i][j] for i in range(len(matrix))):
+                rank.append(j + index)
+        # Delete empty columns
+        for j in range(len(rank)):
+            for i in range(len(matrix)):
+                del matrix[i][rank[j] - j - index]
+            del matrix[rank[j] - j - index]
+        index += len(rank)
+        ranks.append(rank)
+    return ranks
+
+def display_ranks(ranks):
+    print("\nRanks:")
+    for i in range(len(ranks)):
+        print("Rank", i, ":", ranks[i])
+
 if __name__ == "__main__":
     no_negative_edges(table)
 
