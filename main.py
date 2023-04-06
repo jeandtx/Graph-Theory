@@ -5,6 +5,11 @@ def import_graph(filename):
     graph = {"graph": {}, "all_outgoing_edges": []}
     with open('./data/' + filename + '.txt', "r") as file:
         data = file.readlines()
+    oe = []
+    for i in data:
+        if len(i) < 6:
+            oe.append(int(i[0]))
+    graph["graph"][0] = {"weight": 0, "outgoing_edges": oe}#find_entry_points(graph)}
     for i in range(0, len(data)):
         # Clean the data from empty strings and convert to int
         data[i] = data[i].replace('\n', '')
@@ -12,15 +17,16 @@ def import_graph(filename):
         if '' in data[i]: data[i].remove('')
         data[i] = [int(x) for x in data[i]]
 
-        # add all outgoing edges to a list
         graph["all_outgoing_edges"].extend(data[i][2:])
-
 
         graph["graph"][i+1] = {"weight": data[i][1], "outgoing_edges": []}
     for i in data:
         for j in i[2:]:
             graph["graph"][j]["outgoing_edges"].append(i[0])
-
+    for vertices in graph["graph"]:
+        if graph["graph"][vertices]["outgoing_edges"] == []:
+            graph["graph"][vertices]["outgoing_edges"] = [len(data)+1]
+    graph["graph"][len(data)+1] = {"weight": 0, "outgoing_edges": []}
     return graph
 
 def display_graph(graph):
@@ -32,23 +38,16 @@ def display_graph(graph):
     print(len(graph["all_outgoing_edges"]), "edges")
     for vertices in graph["graph"]:
         for outgoing_edges in graph["graph"][vertices]["outgoing_edges"]:
-            print(vertices, "->", outgoing_edges)
+            print(vertices, "->", outgoing_edges, "=", graph["graph"][vertices]["weight"])
 
-def number_entry_point(graph):
+def entry_points(graph):
     """
     Checks the number of entry points.
     Entry point means a vertex with no incoming edges.
-
-    This function checks for all the vertices in the graph if they are in the list of all outgoing edges.
-    If they are not, then they are entry points.
     """
-    ctr = 0
-    for entry_point in graph["graph"]:
-        if entry_point not in graph["all_outgoing_edges"]:
-            ctr += 1
-    return ctr
+    return graph["graph"][0]["outgoing_edges"]
 
-def number_exit_point(graph):
+def exit_points(graph):
     """
     Checks the number of exit points.
     Exit point means that a vertex has no outgoing edges.
@@ -56,10 +55,10 @@ def number_exit_point(graph):
     This function checks the outgoing edges of each vertex in the graph.
     If the list of outgoing edges is empty, then the vertex is an exit point.
     """
-    ctr = 0
+    ctr = []
     for vertices in graph["graph"]:
-        if graph["graph"][vertices]["outgoing_edges"] == []:
-            ctr += 1
+        if graph["graph"][vertices]["outgoing_edges"] == [len(graph["graph"]) - 1]:
+            ctr.append(vertices)
     return ctr
 
 def graph_to_matrix(graph):
@@ -114,11 +113,6 @@ def cycles(matrix):
             return cycles(matrix)
     return True
 
-# def rank(graph, vertex):
-#     if vertex == graph["graph"][0]:
-#         return 0
-#     else:
-#         return 1 + rank(, vertex)
     
 
 if __name__ == "__main__":
