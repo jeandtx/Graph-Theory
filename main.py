@@ -115,7 +115,14 @@ def cycles(matrix):
             return cycles(matrix)
     return True
 
-    
+def negative_edges(graph):
+    """
+    Checks that the graph has no negative edges.
+    """
+    for vertices in graph["graph"]:
+        if graph["graph"][vertices]["weight"] < 0:
+            return False
+    return True
 
 if __name__ == "__main__":
     no_negative_edges(table)
