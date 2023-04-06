@@ -105,6 +105,8 @@ def cycles(matrix):
     """
     if not matrix:
         return False
+    print("\n", "-"*50, "\n")
+    display_matrix(matrix)
     for j in range(len(matrix)):
         if not any(matrix[i][j] for i in range(len(matrix))):
             for i in range(len(matrix)):
