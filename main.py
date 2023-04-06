@@ -72,7 +72,7 @@ def graph_to_matrix(graph):
     matrix = [[0 for _ in range(len(graph["graph"]))] for _ in range(len(graph["graph"]))]
     for vertices in graph["graph"]:
         for outgoing_edges in graph["graph"][vertices]["outgoing_edges"]:
-            matrix[vertices-1][outgoing_edges-1] = 1
+            matrix[vertices][outgoing_edges] = graph["graph"][vertices]["weight"]
     return matrix
 
 def display_matrix(matrix):
