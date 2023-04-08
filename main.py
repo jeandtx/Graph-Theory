@@ -79,6 +79,9 @@ def display_matrix(matrix):
     """
     Displays the matrix in a nice format.
     """
+    if not matrix:
+        print("Empty matrix")
+        return
     n = len(matrix[0])
     print("\n\t", "\t".join(str(i) for i in range(n)))
     for i in range(n):
@@ -90,7 +93,7 @@ def display_matrix(matrix):
                 print(matrix[i][j], end="\t")
         print()
 
-def cycles(matrix):
+def cycles(matrix, display_steps=False):
     """
     Checks that the graph has no cycles.
 
@@ -105,8 +108,9 @@ def cycles(matrix):
     """
     if not matrix:
         return False
-    print("\n", "-"*50, "\n")
-    display_matrix(matrix)
+    if display_steps:
+        print("\n", "-"*50, "\n")
+        display_matrix(matrix)
     for j in range(len(matrix)):
         if not any(matrix[i][j] for i in range(len(matrix))):
             for i in range(len(matrix)):
@@ -121,15 +125,14 @@ def negative_edges(graph):
     """
     for vertices in graph["graph"]:
         if graph["graph"][vertices]["weight"] < 0:
-            return False
-    return True
+            return True
+    return False
 
-def ranks(matrix):
+def compute_ranks(matrix):
     ranks = [[0]]
     for i in range(len(matrix)):
         del matrix[i][0]
     del matrix[0]
-    display_matrix(matrix)
     index = 1
     while matrix:
         rank = []
@@ -151,18 +154,30 @@ def display_ranks(ranks):
     for i in range(len(ranks)):
         print("Rank", i, ":", ranks[i])
 
-if __name__ == "__main__":
-    no_negative_edges(table)
+def earliest_date(graph):
+    """
+    Calculates the earliest date of a graph using Dijkstra's algorithm.
+    It loop through the ranks and for each rank, it loops through the vertices.
+    For each vertex, it loops through the outgoing edges and updates the earliest date of the outgoing edges.
+    It appends the weight + the minimum of the earliest dates of the incoming edges.
+    and returns the earliest date of the last vertex.
+    """
+    if negative_edges(graph):
+        return "Error: negative edges"
+    if cycles(graph_to_matrix(graph)):
+        return "Error: cycles"
 
-    rank(vertices)
+    time = [[0] for _ in range(len(graph_to_matrix(graph)))]
+    for rank in compute_ranks(graph_to_matrix(graph)):
+        for vertex in rank:
+            for outgoing in graph["graph"][vertex]["outgoing_edges"]:
+                if vertex == 0:
+                    time[outgoing].append(time[vertex][-1] + graph["graph"][vertex]["weight"])
+                else:
+                    time[outgoing].append(min(time[vertex][1:]) + graph["graph"][vertex]["weight"])
+    return time, max(time[-1])
+        
 
-    earliest_date(table)
-    latest_date(table)
-    floats(table) # Floats are the tasks that can be delayed without delaying the project. (COPILOT)
+# //TODO Jean il te reste à faire latest_date et les floats et critical path
+# apres ca l'interface et les logs
 
-    compute_critical_path(table)
-    display_critical_path(table)
-
-
-    # // TODO Create interface, see algorithm in subject
-    # // TODO Create execution trace, see algorithm in subject
