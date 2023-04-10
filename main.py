@@ -188,8 +188,8 @@ def earliest_date(graph):
                     time[outgoing].append(graph["graph"][vertex]["weight"])
                 else:
                     time[outgoing].append(max(time[vertex]) + graph["graph"][vertex]["weight"])
-    time = [max(time[i]) for i in range(len(time))]
-    return time, time[-1]
+    output = [max(time[i]) for i in range(len(time))]
+    return output, time[-1], time
 
 def latest_date(graph):
     """
@@ -199,14 +199,26 @@ def latest_date(graph):
         return "Error: negative edges"
     if cycles(graph_to_matrix(graph)):
         return "Error: cycles"
-    earliest, _ = earliest_date(graph)
+    earliest, _, earliest_larged= earliest_date(graph)
     time = [[0] for _ in range(len(graph_to_matrix(graph)))]
-    # for rank in reversed(compute_ranks(graph_to_matrix(graph))):
-    #     for vertex in rank:
-    #         if vertex == 0:
-    #             pass
-    #         else:
-    #             time[vertex].append(min(earliest[vertex][1:]) + graph["graph"][vertex]["weight"])
-    #         log(vertex)
-                
-    return time
+    time[-1] = [0, earliest[-1]]
+    for rank in reversed(compute_ranks(graph_to_matrix(graph))):
+        for vertex in rank:
+            for outgoing in graph["graph"][vertex]["outgoing_edges"]:
+                time[vertex].append(earliest[outgoing] - graph["graph"][vertex]["weight"])
+    output = [time[i][-1] for i in range(len(time))]
+    return output, time[0], time
+
+def floats(earliest, latest):
+    """
+    Compute the floats of a graph. by subtracting the earliest date from the latest date.
+    """
+    floats = [latest[i] - earliest[i] for i in range(len(earliest))]
+    return floats
+
+def critical_path(floats):
+    output = []
+    for i in range(len(floats)):
+        if floats[i] == 0:
+            output.append(i)
+    return output
