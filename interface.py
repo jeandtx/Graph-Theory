@@ -35,12 +35,16 @@ def main():
             else :
                 log ("The graph has no negative edges.")
         elif action == "7":
-            display_ranks(compute_ranks(graph_to_matrix(graph)))
+            if cycles(graph_to_matrix(graph)):
+                log("The graph has cycles. Cannot compute ranks.")
+            else :
+                display_ranks(compute_ranks(graph_to_matrix(graph)))
 
         elif action == "8":
-            list = critical_path(floats(earliest_date(graph), latest_date(graph)))
-            for i in len(list):
-                log("critical path:", list[i])
+            if cycles(graph_to_matrix(graph)):
+                log("The graph has cycles. Cannot compute ranks.")
+            else :
+                log("floats", floats(earliest_date(graph)[0], latest_date(graph)[0]))
             
         elif action == "9":
             log("thanks for using our program :)")
