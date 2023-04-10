@@ -204,7 +204,8 @@ def latest_date(graph):
     for rank in reversed(compute_ranks(graph_to_matrix(graph))):
         for vertex in rank:
             for outgoing in graph["graph"][vertex]["outgoing_edges"]:
-                time[vertex].append(earliest[outgoing] - graph["graph"][vertex]["weight"])
+                time[vertex].append(earliest_larged[outgoing][-1] - graph["graph"][vertex]["weight"])
+                del earliest_larged[outgoing][-1]
     output = [time[i][-1] for i in range(len(time))]
     return output, time[0], time
 
