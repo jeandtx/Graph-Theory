@@ -1,3 +1,16 @@
+def log(*args, **kwargs):
+    import time
+    """
+    This function is used to print to the console.
+    AND to write to the log file.
+    """
+    print(*args, **kwargs)
+    with open("log.log", "a") as f:
+        current_time = time.strftime('%H:%M:%S', time.localtime())
+        print(str(current_time), file=f, end= '  ')
+        print(*args, **kwargs, file=f)
+
+
 def import_graph(filename):
     """
     This function convert a .txt constraint table to a graph under a python dictionary.
@@ -33,12 +46,12 @@ def display_graph(graph):
     """
     Displays the graph in triplet form.
     """
-    print("Creating the scheduling graph:")
-    print(len(graph["graph"]), "vertices")
-    print(len(graph["all_outgoing_edges"]), "edges")
+    log("Creating the scheduling graph:")
+    log(len(graph["graph"]), "vertices")
+    log(len(graph["all_outgoing_edges"]), "edges")
     for vertices in graph["graph"]:
         for outgoing_edges in graph["graph"][vertices]["outgoing_edges"]:
-            print(vertices, "->", outgoing_edges, "=", graph["graph"][vertices]["weight"])
+            log(vertices, "->", outgoing_edges, "=", graph["graph"][vertices]["weight"])
 
 def entry_points(graph):
     """
@@ -80,18 +93,18 @@ def display_matrix(matrix):
     Displays the matrix in a nice format.
     """
     if not matrix:
-        print("Empty matrix")
+        log("Empty matrix")
         return
     n = len(matrix[0])
-    print("\n\t", "\t".join(str(i) for i in range(n)))
+    log("\n\t", "\t".join(str(i) for i in range(n)))
     for i in range(n):
-        print(i, end="\t")
+        log(i, end="\t")
         for j in range(n):
             if matrix[i][j] == 0:
-                print("", end="\t")
+                log("", end="\t")
             else:
-                print(matrix[i][j], end="\t")
-        print()
+                log(matrix[i][j], end="\t")
+        log()
 
 def cycles(matrix, display_steps=False):
     """
@@ -109,7 +122,7 @@ def cycles(matrix, display_steps=False):
     if not matrix:
         return False
     if display_steps:
-        print("\n", "-"*50, "\n")
+        log("\n", "-"*50, "\n")
         display_matrix(matrix)
     for j in range(len(matrix)):
         if not any(matrix[i][j] for i in range(len(matrix))):
@@ -150,13 +163,13 @@ def compute_ranks(matrix):
     return ranks
 
 def display_ranks(ranks):
-    print("\nRanks:")
+    log("\nRanks:")
     for i in range(len(ranks)):
-        print("Rank", i, ":", ranks[i])
+        log("Rank", i, ":", ranks[i])
 
 def earliest_date(graph):
     """
-    Calculates the earliest date of a graph using Dijkstra's algorithm.
+    Calculates the earliest date of a graph.
     It loop through the ranks and for each rank, it loops through the vertices.
     For each vertex, it loops through the outgoing edges and updates the earliest date of the outgoing edges.
     It appends the weight + the minimum of the earliest dates of the incoming edges.
@@ -172,12 +185,28 @@ def earliest_date(graph):
         for vertex in rank:
             for outgoing in graph["graph"][vertex]["outgoing_edges"]:
                 if vertex == 0:
-                    time[outgoing].append(time[vertex][-1] + graph["graph"][vertex]["weight"])
+                    time[outgoing].append(graph["graph"][vertex]["weight"])
                 else:
-                    time[outgoing].append(min(time[vertex][1:]) + graph["graph"][vertex]["weight"])
-    return time, max(time[-1])
-        
+                    time[outgoing].append(max(time[vertex]) + graph["graph"][vertex]["weight"])
+    time = [max(time[i]) for i in range(len(time))]
+    return time, time[-1]
 
-# //TODO Jean il te reste à faire latest_date et les floats et critical path
-# apres ca l'interface et les logs
-
+def latest_date(graph):
+    """
+    Calculates the latest date of a graph
+    """
+    if negative_edges(graph):
+        return "Error: negative edges"
+    if cycles(graph_to_matrix(graph)):
+        return "Error: cycles"
+    earliest, _ = earliest_date(graph)
+    time = [[0] for _ in range(len(graph_to_matrix(graph)))]
+    # for rank in reversed(compute_ranks(graph_to_matrix(graph))):
+    #     for vertex in rank:
+    #         if vertex == 0:
+    #             pass
+    #         else:
+    #             time[vertex].append(min(earliest[vertex][1:]) + graph["graph"][vertex]["weight"])
+    #         log(vertex)
+                
+    return time
