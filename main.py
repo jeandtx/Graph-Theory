@@ -141,6 +141,12 @@ def negative_edges(graph):
     return False
 
 def compute_ranks(matrix):
+    """
+    This function compute the ranks of the graph and returns a list of lists.
+    The first rank have only one element, the entry point.
+    Then while the matrix is not empty, it finds the empty columns and delete them.
+    The deleted columns are the vertices of the next rank.
+    """
     ranks = [[0]]
     for i in range(len(matrix)):
         del matrix[i][0]
