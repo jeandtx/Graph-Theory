@@ -10,7 +10,6 @@ def log(*args, **kwargs):
         print(str(current_time), file=f, end= '  ')
         print(*args, **kwargs, file=f)
 
-
 def import_graph(filename):
     """
     This function convert a .txt constraint table to a graph under a python dictionary.
@@ -201,7 +200,7 @@ def latest_date(graph):
         return "Error: cycles"
     earliest, _, earliest_larged= earliest_date(graph)
     time = [[0] for _ in range(len(graph_to_matrix(graph)))]
-    time[-1] = [0, earliest[-1]]
+    time[-1] = [earliest[-1]]
     for rank in reversed(compute_ranks(graph_to_matrix(graph))):
         for vertex in rank:
             for outgoing in graph["graph"][vertex]["outgoing_edges"]:
